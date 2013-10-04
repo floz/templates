@@ -4,7 +4,7 @@ module.exports = function ( grunt ) {
 	,	sassToWatch = null
 	,	jadeToWatch = null;
 
-	grabFilesToWatch();
+	grabCoffees();
 	initConfig();
 
 	grunt.loadNpmTasks( "grunt-contrib-watch" );
@@ -15,33 +15,40 @@ module.exports = function ( grunt ) {
 	grunt.registerTask( "default", "watch" );
 
 	grunt.event.on( "watch", function( action, filepath ) {
-		grabFilesToWatch();
+		grabCoffees();
 		initConfig();
 	} );
 
-	function grabFilesToWatch() {
+	function grabCoffees() {
 		var baseCoffee = "./src/coffee/";
 		coffeesToWatch = [ baseCoffee + "*.coffee" ];
-		
+
 		grunt.file.recurse( baseCoffee, function(abspath, rootdir, subdir, filename) {
 			if( subdir == undefined )
 				return;
 			coffeesToWatch[ coffeesToWatch.length ] = baseCoffee + subdir + "/*.coffee";
 		});
 
+		// coffeesToWatch.push( "./src/coffee/" );
 		coffeesToWatch.reverse();
 
-		filesToWatch = [ "GruntFile.js", "./src/sass/*.scss", "./src/jade/*.jade" ];
-		filesToWatch = filesToWatch.concat( coffeesToWatch );
+		// filesToWatch = [ "GruntFile.js", "./src/sass/*.scss", "./src/jade/*.jade" ];
+		// filesToWatch = filesToWatch.concat( coffeesToWatch );
 	}
 
 	function initConfig() {
-		grunt.initConfig( {
+		grunt.config.init( {
 			pkg: grunt.file.readJSON('package.json'),
 
 			watch: {
-				files: filesToWatch,
-				tasks: [ "coffee:compile", "compass", "jade:compile" ]
+				coffee: {
+					files: [ "src/coffee/**/*.coffee" ],
+					tasks: [ "coffee:compile" ]
+				},
+				sass: {
+					files: [ "src/sass/**/*.scss" ],
+					tasks: [ "compass" ]
+				}
 			},
 
 			jade: {
@@ -76,5 +83,9 @@ module.exports = function ( grunt ) {
 				}
 			}
 		});
+
+		// grunt.registerTask( "default", "watch" );
+
+		// grunt.registerTask( "default", "fwatch" );
 	}
 }
