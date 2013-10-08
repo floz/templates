@@ -2,9 +2,9 @@ module.exports = function ( grunt ) {
 
 	var srcCoffee = "src/coffee/"
 	,	srcJade = "src/jade/"
-	,	deployJade = "deploy/";
+	,	deployJade = "deploy/"
 
-	var coffeesToWatch = null
+	,  coffeesToWatch = null
 	,	sassToWatch = null
 	,	jadesToWatch = null;
 
