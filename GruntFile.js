@@ -1,39 +1,64 @@
 module.exports = function ( grunt ) {
 
+	var srcCoffee = "src/coffee/"
+	,	srcJade = "src/jade/"
+	,	deployJade = "deploy/";
+
 	var coffeesToWatch = null
 	,	sassToWatch = null
-	,	jadeToWatch = null;
-
-	grabCoffees();
-	initConfig();
+	,	jadesToWatch = null;
 
 	grunt.loadNpmTasks( "grunt-contrib-watch" );
 	grunt.loadNpmTasks( 'grunt-contrib-jade' );
 	grunt.loadNpmTasks( "grunt-contrib-coffee" );
 	grunt.loadNpmTasks( "grunt-contrib-compass" );
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 	grunt.registerTask( "default", "watch" );
 
 	grunt.event.on( "watch", function( action, filepath ) {
-		grabCoffees();
-		initConfig();
-	} );
+		var fileType = getFileType( filepath );
+		if( fileType == "coffee" ) {
+			getCoffees();
+			initConfig();
+		} else if ( fileType == "jade" ) {
+			getJades();
+			initConfig();
+		}
+	});
 
-	function grabCoffees() {
-		var baseCoffee = "./src/coffee/";
-		coffeesToWatch = [ baseCoffee + "*.coffee" ];
+	function getFileType( filepath ) {
+		return filepath.split( "." ).pop();
+	}
 
-		grunt.file.recurse( baseCoffee, function(abspath, rootdir, subdir, filename) {
+	function getCoffees() {
+		coffeesToWatch = [ srcCoffee + "*.coffee" ];
+
+		grunt.file.recurse( srcCoffee, function( abspath, rootdir, subdir, filename ) {
 			if( subdir == undefined )
 				return;
-			coffeesToWatch[ coffeesToWatch.length ] = baseCoffee + subdir + "/*.coffee";
+			coffeesToWatch[ coffeesToWatch.length ] = srcCoffee + subdir + "/*.coffee";
 		});
 
-		// coffeesToWatch.push( "./src/coffee/" );
 		coffeesToWatch.reverse();
+	}
 
-		// filesToWatch = [ "GruntFile.js", "./src/sass/*.scss", "./src/jade/*.jade" ];
-		// filesToWatch = filesToWatch.concat( coffeesToWatch );
+	function getJades() {
+		jadesToWatch = {};
+
+		var deployPath = ""
+		,	fileNameWithoutType = "";
+
+		grunt.file.recurse( srcJade, function( abspath, rootdir, subdir, filename ) {
+			deployPath = deployJade;
+			fileNameWithoutType = filename.split( "." ).shift() + ".html"
+			if( subdir == undefined ) {
+				deployPath += fileNameWithoutType;
+			} else {
+				deployPath += subdir + "/" + fileNameWithoutType;
+			}
+			jadesToWatch[ deployPath ] = abspath;
+		});
 	}
 
 	function initConfig() {
@@ -48,6 +73,10 @@ module.exports = function ( grunt ) {
 				sass: {
 					files: [ "src/sass/**/*.scss" ],
 					tasks: [ "compass" ]
+				},
+				jade: {
+					files: [ "src/jade/**/*.jade" ],
+					tasks: [ "jade:compile" ]
 				}
 			},
 
@@ -58,9 +87,7 @@ module.exports = function ( grunt ) {
 							debug: true
 						}
 					},
-					files: {
-						"./deploy/index.html": "./src/jade/index.jade"
-					}
+					files: jadesToWatch
 				}
 			},
 
@@ -70,7 +97,7 @@ module.exports = function ( grunt ) {
 						bare: true
 					},
 					files: {
-						"./deploy/js/main.min.js" : coffeesToWatch
+						"deploy/js/main.js": coffeesToWatch
 					}
 				}
 			},
@@ -78,14 +105,27 @@ module.exports = function ( grunt ) {
 			compass: {
 				dist: {
 					options: {
-						config: "./config.rb"
+						config: "config.rb"
+					}
+				}
+			},
+
+			uglify: {
+				compile: {
+					files: {
+						"deploy/js/main.min.js": "deploy/js/main.js"
 					}
 				}
 			}
 		});
-
-		// grunt.registerTask( "default", "watch" );
-
-		// grunt.registerTask( "default", "fwatch" );
 	}
+
+	getCoffees();
+	getJades();
+	initConfig();
+
+	grunt.registerTask( "compile", [ "jade:compile", "coffee:compile", "compass" ] )
+	grunt.registerTask( "all", [ "jade:compile", "coffee:compile", "compass", "uglify" ] )
+
+	grunt.task.run( "compile" );
 }
