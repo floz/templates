@@ -12,6 +12,7 @@ module.exports = function ( grunt ) {
     grunt.loadNpmTasks( "grunt-contrib-jade" );
     grunt.loadNpmTasks( "grunt-contrib-coffee" );
     grunt.loadNpmTasks( "grunt-contrib-compass" );
+    grunt.loadNpmTasks( "grunt-contrib-imagemin" );
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
 
     grunt.registerTask( "default", "watch" );
@@ -110,6 +111,20 @@ module.exports = function ( grunt ) {
                 }
             },
 
+            imagemin: {
+                dynamic: {
+                    options: {
+                        optimizationLevel: 7
+                    },
+                    files: [ {
+                        expand: true,
+                        cwd: "deploy/img/",
+                        dest: "deploy/img/",
+                        src: [ "**/*.{png,jpg}"]
+                    }]
+                }
+            },
+
             uglify: {
                 compile: {
                     files: {
@@ -124,8 +139,9 @@ module.exports = function ( grunt ) {
     getJades();
     initConfig();
 
+    grunt.registerTask( "compressimg", [ "imagemin:dynamic" ] );
     grunt.registerTask( "compile", [ "jade:compile", "coffee:compile", "compass" ] )
     grunt.registerTask( "all", [ "jade:compile", "coffee:compile", "compass", "uglify" ] )
 
-    grunt.task.run( "compile" );
+    //grunt.task.run( "compile" );
 }
