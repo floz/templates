@@ -4,15 +4,15 @@ module.exports = function ( grunt ) {
     ,   srcJade = "src/jade/"
     ,   deployJade = "deploy/"
 
-    ,  coffeesToWatch = null
+    ,   coffeesToWatch = null
     ,   sassToWatch = null
     ,   jadesToWatch = null;
 
     grunt.loadNpmTasks( "grunt-contrib-watch" );
-    grunt.loadNpmTasks( 'grunt-contrib-jade' );
+    grunt.loadNpmTasks( "grunt-contrib-jade" );
     grunt.loadNpmTasks( "grunt-contrib-coffee" );
     grunt.loadNpmTasks( "grunt-contrib-compass" );
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks( "grunt-contrib-uglify" );
 
     grunt.registerTask( "default", "watch" );
 
