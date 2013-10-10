@@ -16,3 +16,11 @@ And then:
 grunt
 ```
 And you are ready to go.
+
+## ImageOptim
+
+> grunt-imagemin is used to do this process.
+```shell
+grunt imageoptim
+```
+To launch the task.

@@ -139,7 +139,7 @@ module.exports = function ( grunt ) {
     getJades();
     initConfig();
 
-    grunt.registerTask( "compressimg", [ "imagemin:dynamic" ] );
+    grunt.registerTask( "imageoptim", [ "imagemin:dynamic" ] );
     grunt.registerTask( "compile", [ "jade:compile", "coffee:compile", "compass" ] )
     grunt.registerTask( "all", [ "jade:compile", "coffee:compile", "compass", "uglify" ] )
 
